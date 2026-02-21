@@ -6,10 +6,19 @@ import os
 script_folder = os.path.dirname(os.path.abspath(__file__))
 working_folder = os.path.join(script_folder, "../" + utils.constants.LLM_WORKING_FOLDER)
 llm_config = {
-    "model": utils.constants.OPENAI_MODEL_NAME,
-    "api_key": utils.constants.OPENAI_API_KEY,
+    "model": utils.constants.OPENAI_MODEL_NAME or "llama-3.3-70b-versatile",
+    "base_url": utils.constants.OPENAI_API_BASE or "https://api.groq.com/openai/v1",
+    "api_key": utils.constants.GROQ_API_KEY or utils.constants.OPENAI_API_KEY,
     "cache_seed": None,
+    "temperature": 0.2,
+    "max_tokens": 256,
 }
+
+fast_llm_config = llm_config.copy()
+fast_llm_config["model"] = "llama-3.1-8b-instant"
+
+# if utils.constants.OPENAI_API_BASE:
+#     llm_config["base_url"] = utils.constants.OPENAI_API_BASE
 
 
 def clean_working_directory(agent_subfolder: str):
@@ -22,7 +31,12 @@ def clean_working_directory(agent_subfolder: str):
         return
 
     if not os.path.exists(working_subfolder):
-        print(f"The folder {working_subfolder} does not exist.")
+        # Create the folder if it doesn't exist
+        try:
+            os.makedirs(working_subfolder, exist_ok=True)
+            print(f"Created folder {working_subfolder}")
+        except Exception as e:
+            print(f"Failed to create {working_subfolder}. Reason: {e}")
         return
 
     # Loop through all the items in the folder

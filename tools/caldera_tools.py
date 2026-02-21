@@ -5,9 +5,15 @@ import json
 import utils.constants
 from time import sleep
 import base64
-from autogen.agentchat.contrib.capabilities.context_handling import (
-    truncate_str_to_tokens,
-)
+def truncate_str_to_tokens(text: str, n_tokens: int) -> str:
+    try:
+        encoding = tiktoken.encoding_for_model("gpt-4")
+    except KeyError:
+        encoding = tiktoken.get_encoding("cl100k_base")
+    encoded_tokens = encoding.encode(text)
+    truncated_tokens = encoded_tokens[:n_tokens]
+    truncated_text = encoding.decode(truncated_tokens)
+    return truncated_text
 import requests
 
 
