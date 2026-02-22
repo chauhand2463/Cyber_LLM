@@ -11,3 +11,7 @@ notebook
 flake8
 fastapi
 uvicorn
+streamlit
+plotly
+requests
+beautifulsoup4

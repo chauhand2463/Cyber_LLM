@@ -69,36 +69,40 @@ def run_extreme():
     class S(Scenario):
         name = "Extreme"
         steps = [
-            # System
+            # System Info
             ScenarioStep(step_name="SYS", agent_name="cmd_exec_agent", instruction_template="systeminfo", save_output_to_context_key="sys"),
-            # Network
+            # Network + Process Correlation
             ScenarioStep(step_name="NET", agent_name="cmd_exec_agent", instruction_template="netstat -ano", save_output_to_context_key="net"),
-            ScenarioStep(step_name="ARP", agent_name="cmd_exec_agent", instruction_template="arp -a", save_output_to_context_key="arp"),
-            # Processes
             ScenarioStep(step_name="PROC", agent_name="cmd_exec_agent", instruction_template="tasklist", save_output_to_context_key="proc"),
+            # Vulnerability Audit (Using systeminfo - has hotfixes)
+            # Persistence Deep-Dive
+            ScenarioStep(step_name="REG_RUN", agent_name="cmd_exec_agent", instruction_template="reg query HKLM\\Software\\Microsoft\\Windows\\CurrentVersion\\Run", save_output_to_context_key="reg_run"),
+            ScenarioStep(step_name="REG_RONCE", agent_name="cmd_exec_agent", instruction_template="reg query HKLM\\Software\\Microsoft\\Windows\\CurrentVersion\\RunOnce", save_output_to_context_key="reg_runonce"),
+            # Service Exploitation Check
+            ScenarioStep(step_name="SERV_DETAIL", agent_name="cmd_exec_agent", instruction_template="sc queryex type= service state= all", save_output_to_context_key="serv_detail"),
+            # Tasks & Services
             ScenarioStep(step_name="SERV", agent_name="cmd_exec_agent", instruction_template="sc query", save_output_to_context_key="serv"),
-            # Persistence
-            ScenarioStep(step_name="REG", agent_name="cmd_exec_agent", instruction_template="reg query HKLM\\Software\\Microsoft\\Windows\\CurrentVersion\\Run", save_output_to_context_key="reg"),
             ScenarioStep(step_name="TASK", agent_name="cmd_exec_agent", instruction_template="schtasks /query /fo LIST /v", save_output_to_context_key="task"),
-            # Users
+            # Users & Admin
             ScenarioStep(step_name="USR", agent_name="cmd_exec_agent", instruction_template="net user", save_output_to_context_key="usr"),
             ScenarioStep(step_name="ADM", agent_name="cmd_exec_agent", instruction_template="net localgroup administrators", save_output_to_context_key="adm"),
             # Security
             ScenarioStep(step_name="FW", agent_name="cmd_exec_agent", instruction_template="netsh advfirewall show allprofiles", save_output_to_context_key="fw"),
             ScenarioStep(step_name="DRV", agent_name="cmd_exec_agent", instruction_template="driverquery", save_output_to_context_key="drv"),
+            ScenarioStep(step_name="ARP", agent_name="cmd_exec_agent", instruction_template="arp -a", save_output_to_context_key="arp"),
         ]
     
     ctx = ScenarioRunner({"cmd_exec_agent": cmd_exec_agent}).run(S())
     
-    # Extract key info
-    print(f"  SYSTEM     : {len(ctx.get('sys',''))} bytes")
-    print(f"  NETWORK    : {len(ctx.get('net',''))} bytes")
-    print(f"  PROCESSES  : {len(ctx.get('proc',''))} bytes")
-    print(f"  SERVICES   : {len(ctx.get('serv',''))} bytes")
-    print(f"  REGISTRY   : {len(ctx.get('reg',''))} bytes")
-    print(f"  TASKS      : {len(ctx.get('task',''))} bytes")
-    print(f"  USERS      : {len(ctx.get('usr',''))} bytes")
-    print(f"  DRIVERS    : {len(ctx.get('drv',''))} bytes")
+    # Extract key info with EXTREME analysis
+    print(f"  [+] SYSTEM    : {len(ctx.get('sys',''))} bytes")
+    print(f"  [+] NETSTAT  : {len(ctx.get('net',''))} bytes (PID mapped)")
+    print(f"  [+] PROCESSES: {len(ctx.get('proc',''))} bytes")
+    print(f"  [+] SERVICES : {len(ctx.get('serv_detail',''))} bytes (exploit check)")
+    print(f"  [+] REG_RUN  : {len(ctx.get('reg_run',''))} bytes (persistence)")
+    print(f"  [+] TASKS    : {len(ctx.get('task',''))} bytes")
+    print(f"  [+] USERS    : {len(ctx.get('usr',''))} bytes")
+    print(f"  [+] DRIVERS  : {len(ctx.get('drv',''))} bytes")
     print("-"*40)
     return ctx
 

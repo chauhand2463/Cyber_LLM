@@ -1,7 +1,11 @@
 import sys
 import os
 
-sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+PACKAGE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+if PACKAGE_DIR not in sys.path:
+    sys.path.insert(0, PACKAGE_DIR)
+
+from engine.jarvis_controller import JarvisController
 
 def print_banner():
     print("""
@@ -60,8 +64,6 @@ Web/OSINT:
 General:
   Any question     - Ask JARVIS anything
 """)
-
-from engine.jarvis_controller import JarvisController
 
 def format_output(data, intent):
     """Format output based on intent type."""
