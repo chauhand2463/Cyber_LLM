@@ -9,7 +9,7 @@ import os
 
 def main():
     """Main entry point for CyberLLM CLI."""
-    from interactive_session import run_interactive
+    from cyberllm.interactive_session import run_interactive
     run_interactive()
 
 if __name__ == "__main__":
