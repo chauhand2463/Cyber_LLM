@@ -1,10 +1,10 @@
 # CyberLLM: Autonomous Cybersecurity AI Agent
 
 <p align="center">
-  <img src="https://img.shields.io/badge/CyberLLM-v1.0.0-green" alt="Version">
+  <img src="https://img.shields.io/badge/CyberLLM-v2.0-green" alt="Version">
   <img src="https://img.shields.io/badge/Python-3.9+-blue" alt="Python">
   <img src="https://img.shields.io/badge/License-MIT-yellow" alt="License">
-  <img src="https://img.shields.io/badge/Groq-FreeAPI-orange" alt="Groq API">
+  <img src="https://img.shields.io/badge-LLM-Local%20%2B%20API-orange" alt="LLM">
 </p>
 
 ---
@@ -15,10 +15,10 @@
 2. [Features](#features)
 3. [Installation](#installation)
 4. [How to Run](#how-to-run)
-5. [Menu Options](#menu-options)
-6. [JARVIS AI Assistant](#jarvis-ai-assistant)
-7. [OSINT Tools](#osint-tools)
-8. [Security Scans](#security-scans)
+5. [LLM Configuration](#llm-configuration)
+6. [Menu Options](#menu-options)
+7. [JARVIS AI Assistant](#jarvis-ai-assistant)
+8. [OSINT Tools](#osint-tools)
 9. [Architecture](#architecture)
 10. [Configuration](#configuration)
 11. [Troubleshooting](#troubleshooting)
@@ -32,14 +32,11 @@
 
 ### Key Highlights
 
-- 🤖 **JARVIS AI** - Natural language interface for security operations
-- 🔍 **Automated Scanning** - Multiple scan modes (INFO, EXTREME, NETWORK, AUDIT, THREAT, FULL)
-- 🌐 **Web Scraping** - Scrape websites for security research
-- 🔎 **CVE Lookup** - Look up vulnerabilities from NIST database
-- 🌍 **IP Lookup** - Get IP geolocation and ISP information
-- 🛡️ **Threat Hunting** - Scan for malware and suspicious processes
-- 👥 **User Auditing** - List administrators and user accounts
-- 📡 **Network Analysis** - Check open ports and connections
+- **Dual LLM Support** - Use local Ollama models or Groq API
+- **JARVIS AI** - Natural language interface for security operations
+- **Cross-Platform** - Works on Windows, Linux, and Mac
+- **Persistent Memory** - SQLite-based learning from past incidents
+- **Auto-Detection** - Automatically detects Ollama when available
 
 ---
 
@@ -49,21 +46,22 @@
 
 | Feature | Description |
 |---------|-------------|
-| **JARVIS AI** | Natural language assistant that understands commands like "check open ports" or "show me CVE-2024-1234" |
-| **Intent Classification** | Automatically detects user intent (NETWORK_SCAN, USER_AUDIT, THREAT_HUNT, etc.) |
-| **Multi-Agent System** | Coordinator, Hunter, Analyst agents working together |
-| **Memory Engine** | SQLite-based learning from past incidents |
-| **Auto-Recovery** | Detects and fixes OS-specific errors automatically |
+| **Dual LLM Mode** | Use local Ollama (gpt-oss-20b) or Groq API |
+| **JARVIS AI** | Natural language assistant for security operations |
+| **Intent Classification** | Automatically detects user intent |
+| **Memory Engine** | SQLite-based persistent learning |
+| **Cross-Platform** | Windows, Linux, Mac support |
+| **OSINT Tools** | CVE lookup, IP lookup, web scraping |
 
 ### Scan Modes
 
-- **INFO** - Quick system information
-- **EXTREME** - Full threat hunt with all checks
-- **JARVIS** - Interactive AI assistant
+- **QUICK** - Quick system information
 - **NETWORK** - Network connections and ports
-- **AUDIT** - User and group auditing
-- **THREAT** - Malware and threat detection
+- **USERS** - User and group auditing
+- **PROCESSES** - Running processes
+- **SERVICES** - System services
 - **FULL** - Complete security scan
+- **JARVIS** - Interactive AI assistant
 
 ---
 
@@ -72,7 +70,8 @@
 ### Prerequisites
 
 - Python 3.9 or higher
-- Groq API Key (free)
+- **Option A**: Ollama (for local LLM)
+- **Option B**: Groq API Key (free)
 
 ### Steps
 
@@ -84,297 +83,184 @@ cd cyber-security-llm-agents
 # 2. Install dependencies
 pip install -r requirements.txt
 
-# 3. Install the package
-pip install -e .
-
-# 4. Configure API key
-# Create .env file with your Groq API key
-echo "GROQ_API_KEY=your_api_key_here" > .env
+# 3. Configure LLM (see below)
 ```
-
-### Get Free Groq API Key
-
-1. Go to [groq.com](https://groq.com)
-2. Sign up for free
-3. Copy your API key
-4. Add to `.env` file
 
 ---
 
 ## How to Run
 
-### Method 1: Using cyberllm command (Recommended)
-
-```bash
-# After installation
-cyberllm
-```
-
-### Method 2: Using Python module
-
-```bash
-python -m cyberllm
-```
-
-### Method 3: Using main.py directly
+### Option 1: Menu Interface (Recommended)
 
 ```bash
 python main.py
 ```
 
-### Method 4: Interactive Session
+### Option 2: JARVIS AI Assistant
 
 ```bash
-python interactive_session.py
+python jarvis.py
 ```
 
-### Quick Start with Mode Number
+### Quick Commands
+
+```
+# From main.py menu:
+[J] JARVIS    - Interactive AI Assistant
+[L] LOCAL     - Switch to local Ollama
+[A] API       - Switch to Groq API
+[1-6]         - Run scans
+[0] EXIT      - Quit
+```
+
+---
+
+## LLM Configuration
+
+### Option A: Local Ollama (Recommended)
 
 ```bash
-# Run directly with mode number
-python main.py 1       # Quick system info
-python main.py 2       # EXTREME - Full threat hunt
-python main.py 3       # JARVIS - AI Assistant
-python main.py 4       # NETWORK - Network scan
-python main.py 5       # AUDIT - User audit
-python main.py 6       # THREAT - Threat scan
-python main.py 7       # FULL - Complete scan
+# Install Ollama
+curl https://ollama.ai/install.sh
+
+# Pull your model
+ollama pull gpt-oss-20b
+# or
+ollama pull llama3
+
+# Start Ollama
+ollama serve
+```
+
+### Option B: Groq API
+
+```bash
+# Get free API key at https://groq.com
+# Add to .env file:
+GROQ_API_KEY=your_groq_api_key
+```
+
+### .env Configuration
+
+```bash
+# Local LLM (Ollama)
+USE_LOCAL_LLM=true
+LOCAL_LLM_URL=http://localhost:11434/v1
+LOCAL_LLM_MODEL=gpt-oss-20b
+LOCAL_LLM_API_KEY=ollama
+
+# Or API (Groq)
+USE_LOCAL_LLM=false
+GROQ_API_KEY=your_api_key_here
+OPENAI_API_BASE=https://api.groq.com/openai/v1
 ```
 
 ---
 
 ## Menu Options
 
-When you run `cyberllm`, you'll see this menu:
+### main.py
 
 ```
-==================================================
-  MODE  |  COMMAND                                  
-==================================================
-  [1]   |  INFO      - Quick system info            
-  [2]   |  EXTREME   - Full threat hunt             
-  [3]   |  JARVIS    - AI Assistant (Interactive)  
-  [4]   |  NETWORK   - Network scan                 
-  [5]   |  AUDIT     - User audit                   
-  [6]   |  THREAT    - Threat scan                  
-  [7]   |  FULL      - Complete scan                 
-  [0]   |  EXIT      - Quit                         
-==================================================
+SELECT MODE:
+  ─────────────────────────────
+  [1] QUICK     - Quick system info
+  [2] NETWORK   - Network connections
+  [3] USERS     - User audit
+  [4] PROCESSES - Running processes
+  [5] SERVICES  - System services
+  [6] FULL      - Complete scan
+  ─────────────────────────────
+  [J] JARVIS    - Interactive AI Assistant
+  ─────────────────────────────
+  [L] LOCAL     - Switch to local Ollama
+  [A] API       - Switch to Groq API
+  ─────────────────────────────
+  [0] EXIT      - Quit
 ```
-
-### Mode Details
-
-| Mode | Number | Description | Commands Run |
-|------|--------|-------------|--------------|
-| **INFO** | 1 | Quick system info | hostname, ipconfig, ver, whoami |
-| **EXTREME** | 2 | Full threat hunt | All system, network, process, service, registry checks |
-| **JARVIS** | 3 | AI Assistant | Natural language interface |
-| **NETWORK** | 4 | Network scan | ipconfig, netstat, arp, route |
-| **AUDIT** | 5 | User audit | net user, net localgroup administrators |
-| **THREAT** | 6 | Threat scan | Processes, services, network, registry |
-| **FULL** | 7 | Complete scan | All above + drivers, firewall |
-| **EXIT** | 0 | Quit | - |
 
 ---
 
 ## JARVIS AI Assistant
 
-Mode 3 launches the JARVIS AI Assistant. You can interact with it using natural language.
+### What You Can Ask
 
-### What You Can Ask JARVIS
-
-#### 🔗 Web Scraping
 ```
-JARVIS > https://example.com
-JARVIS > https://github.com
-```
-JARVIS will scrape the website and extract:
-- Title
-- Tech stack
-- Emails
-- Endpoints
-- Versions
-- Content snippets
-
-#### 🔎 CVE Lookup
-```
-JARVIS > CVE-2024-1234
-JARVIS > CVE-2021-44228
-```
-JARVIS fetches:
-- CVE ID
-- Description
-- Severity (LOW/MEDIUM/HIGH/CRITICAL)
-- CVSS Score
-- Publication date
-
-#### 🌐 IP Lookup
-```
-JARVIS > 8.8.8.8
-JARVIS > 1.1.1.1
-```
-JARVIS provides:
-- Country
-- Region/City
-- ISP
-- Organization
-- AS number
-
-#### 💻 Security Scans
-```
-JARVIS > check open ports
-JARVIS > list administrators
-JARVIS > system info
-JARVIS > scan for threats
-JARVIS > check startup programs
-JARVIS > show network connections
-```
-
-#### ❓ General Questions
-```
-JARVIS > what is Python?
-JARVIS > how does HTTPS work?
+JARVIS > who is the president of usa
 JARVIS > explain SQL injection
+JARVIS > check open ports
+JARVIS > CVE-2024-1234
+JARVIS > 8.8.8.8
+JARVIS > https://example.com
+JARVIS > run full scan
+JARVIS > list administrators
 ```
 
-#### 📊 Format Requests
-```
-JARVIS > show me data in json format
-JARVIS > give me a table of ports
-JARVIS > export as csv
-```
-
-### JARVIS Commands
+### Commands
 
 | Command | Description |
 |---------|-------------|
-| `help` or `?` | Show help menu |
-| `menu` | Return to main menu |
-| `clear` or `cls` | Clear screen |
-| `exit` or `quit` | Exit JARVIS |
-| `back` | Return to main menu |
+| `help` | Show help |
+| `local` / `l` | Switch to local Ollama |
+| `api` / `a` | Switch to Groq API |
+| `clear` | Clear screen |
+| `exit` | Exit |
+
+### Security Scans
+
+```
+network      - Network connections
+ports        - Open ports
+processes    - Running processes
+users        - List users
+admins       - List admins
+services     - Running services
+startup      - Startup programs
+firewall     - Firewall status
+full scan    - Complete system scan
+threat hunt  - Quick threat scan
+```
+
+### OSINT
+
+```
+CVE-2024-xxx - CVE vulnerability lookup
+8.8.8.8      - IP geolocation
+https://...  - Web scraping
+```
 
 ---
 
 ## OSINT Tools
-
-CyberLLM includes built-in OSINT tools:
 
 ### CVE Lookup
 - Uses NIST National Vulnerability Database
 - Returns severity, CVSS score, description
 
 ### IP Lookup
-- Uses ip-api.com (free)
 - Returns geolocation, ISP, organization
+- Threat intelligence checking
 
 ### Web Scraping
-- Fast static HTML scraping
-- Security-focused extraction:
-  - Emails
-  - API keys
-  - AWS keys
-  - Tech stack detection
-  - API endpoints
-  - Version numbers
-  - CVE mentions
-
-### Domain Info
-- DNS resolution
-- A record lookup
-
-### Google Dorks (Limited)
-- Provides manual search URLs
-- Pre-built dork queries for:
-  - Exposed configs (.env, .config)
-  - Exposed databases
-  - Credentials
-  - Admin panels
-  - Git exposures
-
----
-
-## Security Scans
-
-### Network Scanning
-- `ipconfig` - IP configuration
-- `netstat -ano` - All network connections
-- `arp -a` - ARP table
-- `route print` - Routing table
-
-### User Auditing
-- `net user` - All users
-- `net localgroup administrators` - Admin group
-- `net user username` - User details
-
-### Process & Service Analysis
-- `tasklist` - Running processes
-- `sc query` - Windows services
-- `tasklist /v` - Detailed process info
-
-### Persistence Detection
-- Registry Run keys
-- Scheduled tasks
-- Startup programs
-- Windows services
-
-### System Information
-- `systeminfo` - Full system details
-- `hostname` - Computer name
-- `whoami` - Current user
-- `ver` - Windows version
-- `driverquery` - Installed drivers
-- `netsh advfirewall show allprofiles` - Firewall rules
+- Security-focused extraction
+- Emails, IPs, tech stack detection
 
 ---
 
 ## Architecture
 
 ```
-┌─────────────────────────────────────────────────┐
-│              CyberLLM Main Menu                  │
-└─────────────────┬───────────────────────────────┘
-                  │
-    ┌─────────────┼─────────────┐
-    │             │             │
-    ▼             ▼             ▼
-┌───────┐   ┌─────────┐   ┌─────────┐
-│ INFO  │   │ JARVIS  │   │ NETWORK │
-│ MODE  │   │  MODE   │   │  MODE   │
-└───┬───┘   └────┬────┘   └───┬─────┘
-    │            │             │
-    └────────────┼─────────────┘
-                 │
-         ┌───────▼────────┐
-         │   JARVIS       │
-         │ Controller     │
-         └───────┬────────┘
-                 │
-    ┌────────────┼────────────┐
-    │            │            │
-    ▼            ▼            ▼
-┌────────┐ ┌──────────┐ ┌─────────┐
-│Intent  │ │ Scenario │ │  Agent  │
-│Classif.│ │ Engine   │ │ Coord.  │
-└───┬────┘ └────┬────┘ └────┬────┘
-    │            │            │
-    ▼            ▼            ▼
-┌────────┐ ┌──────────┐ ┌─────────┐
-│Network │ │ Security │ │  Cmd    │
-│Scan    │ │ Tools    │ │ Executor│
-└────────┘ └──────────┘ └─────────┘
+cyberllm/
+├── core/
+│   ├── jarvis.py      # Main JARVIS controller
+│   ├── scanner.py     # Cross-platform scanner
+│   ├── intent.py      # Intent classifier
+│   ├── memory.py      # SQLite memory
+│   └── osint.py       # CVE, IP, web tools
+├── main.py            # Menu interface
+├── jarvis.py          # AI assistant
+└── .env              # Configuration
 ```
-
-### Components
-
-| Component | Description |
-|-----------|-------------|
-| **Intent Classifier** | Detects user intent from natural language |
-| **Scenario Engine** | Orchestrates multi-step security scans |
-| **JARVIS Controller** | Main brain coordinating all operations |
-| **Memory Store** | SQLite database for learning |
-| **CmdExecutor** | Executes local OS commands |
-| **Agent System** | Coordinator, Analyst, Hunter agents |
 
 ---
 
@@ -382,91 +268,51 @@ CyberLLM includes built-in OSINT tools:
 
 ### Environment Variables
 
-Create a `.env` file:
-
 ```bash
-# Required
-GROQ_API_KEY=your_groq_api_key_here
+# Local LLM
+USE_LOCAL_LLM=true
+LOCAL_LLM_URL=http://localhost:11434/v1
+LOCAL_LLM_MODEL=gpt-oss-20b
 
-# Optional
-OPENAI_API_KEY=your_openai_key
+# API LLM
+USE_LOCAL_LLM=false
+GROQ_API_KEY=your_groq_api_key
 OPENAI_API_BASE=https://api.groq.com/openai/v1
-```
-
-### Package Configuration (pyproject.toml)
-
-```toml
-[project]
-name = "cyberllm"
-version = "1.0.0"
-description = "CyberLLM - Autonomous Cybersecurity AI Agent"
-requires-python = ">=3.9"
-
-[project.scripts]
-cyberllm = "cyberllm.main:main"
 ```
 
 ---
 
 ## Troubleshooting
 
-### Common Issues
+### Ollama Not Detected
 
-#### 1. "No module named 'xxx'"
 ```bash
-# Install missing dependencies
-pip install -r requirements.txt
+# Start Ollama
+ollama serve
 ```
 
-#### 2. "GROQ_API_KEY not found"
+### API Key Issues
+
 ```bash
-# Create .env file
-echo "GROQ_API_KEY=your_key" > .env
+# Check .env file exists and has correct key
+cat .env
 ```
 
-#### 3. "Command not found" (cyberllm)
-```bash
-# Reinstall the package
-pip install -e .
-```
-
-#### 4. Network scan fails
-- Ensure you're running on Windows
-- Some commands require admin privileges
-
-### Getting Help
-
-1. Check the menu help: Type `help` in JARVIS mode
-2. Review the logs in `llm_working_folder/memory.db`
-3. Run in verbose mode for more output
-
----
-
-## Publishing to PyPI
-
-To share your package with the world:
+### Model Not Found
 
 ```bash
-# Install build tools
-pip install build twine
+# List available models
+ollama list
 
-# Build the package
-python -m build
-
-# Upload to PyPI
-twine upload dist/*
-```
-
-Then users can install with:
-```bash
-pip install cyberllm
+# Pull model
+ollama pull gpt-oss-20b
 ```
 
 ---
 
 ## License
 
-MIT License - See LICENSE file for details.
+MIT License
 
 ---
 
@@ -477,5 +323,5 @@ MIT License - See LICENSE file for details.
 ---
 
 <div align="center">
-  <i>CyberLLM - From Chatbot to Cyber Defense Grid</i>
+  <i>CyberLLM v2.0 - From Chatbot to Cyber Defense Grid</i>
 </div>

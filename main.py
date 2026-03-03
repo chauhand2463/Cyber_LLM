@@ -1,19 +1,23 @@
 #!/usr/bin/env python
 """
-CyberLLM - Unified Entry Point
-Single command to run the different framework in modes.
-Supports both Local LLM (Ollama) and API (Groq/OpenAI).
+CyberLLM - Main Entry Point
+Menu-based interface with Local/API LLM support
 """
-import sys
 import os
-import warnings
+import sys
 import urllib.request
+import io
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
-# Check for Ollama on startup
+if sys.platform == "win32":
+    try:
+        sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
+        sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding='utf-8')
+    except:
+        pass
+
 def check_ollama():
-    """Check if Ollama is running."""
     try:
         urllib.request.urlopen('http://localhost:11434', timeout=2)
         return True
@@ -21,17 +25,6 @@ def check_ollama():
         return False
 
 OLLAMA_AVAILABLE = check_ollama()
-USE_LOCAL_LLM = False
-
-def set_llm_mode(use_local: bool):
-    """Set the LLM mode and update environment."""
-    global USE_LOCAL_LLM
-    USE_LOCAL_LLM = use_local
-    os.environ['USE_LOCAL_LLM'] = 'true' if use_local else 'false'
-    if use_local:
-        print(f"\n[+] LLM Mode: Local (Ollama - gpt-oss-20b)")
-    else:
-        print(f"\n[+] LLM Mode: API (Groq)")
 
 def print_banner():
     print(r"""
@@ -41,314 +34,154 @@ def print_banner():
  | |___/ /  __/  __// /_/ / / / // /_/ / ___ | |___ ___/ /__  
   \____/_/\___/\___/ \____/_/ /_/ \____/_/   |_/____/\___/   
                                                             
-  [+] CyberLLM SECURITY AGENT v1.0
-  [+] Local + API Edition
+  [+] CyberLLM SECURITY AGENT v2.0
+  [+] Powered by GPT-OSS-20B
   """)
-    if OLLAMA_AVAILABLE:
-        print(f"  [+] Ollama: DETECTED (Local LLM available)")
-    else:
-        print(f"  [+] Ollama: Not running (API mode only)")
+    print(f"  [+] Ollama: {'Available' if OLLAMA_AVAILABLE else 'Not running'}")
+    print(f"  [+] Mode: LOCAL" if OLLAMA_AVAILABLE else "  [+] Mode: API")
 
 def print_menu():
-    print("SELECT MODE:")
-    print("  [L]  LOCAL    - Use local Ollama model")
-    print("  [A]  API      - Use Groq API")
-    print("  ─────────────────────────────")
-    print("  [1] INFO      - Quick system info")
-    print("  [2] EXTREME   - Full threat hunt")
-    print("  [3] JARVIS    - AI Assistant")
-    print("  [4] NETWORK   - Network scan")
-    print("  [5] AUDIT     - User audit")
-    print("  [6] THREAT    - Threat scan")
-    print("  [7] FULL      - Complete scan")
-    print("  [0] EXIT      - Quit\n")
+    print("""
+SELECT MODE:
+  ─────────────────────────────
+  [1] QUICK     - Quick system info
+  [2] NETWORK   - Network connections
+  [3] USERS     - User audit
+  [4] PROCESSES - Running processes
+  [5] SERVICES  - System services
+  [6] FULL      - Complete scan
+  ─────────────────────────────
+  [J] JARVIS    - Interactive AI Assistant
+  ─────────────────────────────
+  [L] LOCAL     - Switch to local Ollama
+  [A] API       - Switch to Groq API
+  ─────────────────────────────
+  [0] EXIT      - Quit
+""")
 
-def run_simple():
-    print("\n[MODE] INFO SCAN\n" + "-"*40)
-    from engine.scenario_engine import ScenarioRunner, Scenario, ScenarioStep
-    from agents.code_agents import cmd_exec_agent
-    
-    class S(Scenario):
-        name = "Info"
-        steps = [
-            ScenarioStep(step_name="H", agent_name="cmd_exec_agent", instruction_template="hostname", save_output_to_context_key="h"),
-            ScenarioStep(step_name="I", agent_name="cmd_exec_agent", instruction_template="ipconfig", save_output_to_context_key="i"),
-            ScenarioStep(step_name="O", agent_name="cmd_exec_agent", instruction_template="ver", save_output_to_context_key="o"),
-            ScenarioStep(step_name="U", agent_name="cmd_exec_agent", instruction_template="whoami", save_output_to_context_key="u"),
-        ]
-    
-    ctx = ScenarioRunner({"cmd_exec_agent": cmd_exec_agent}).run(S())
-    
-    print(f"  HOSTNAME   : {ctx.get('h', 'N/A')}")
-    print(f"  OS         : {ctx.get('o', 'N/A')}")
-    print(f"  USER       : {ctx.get('u', 'N/A')}")
-    ip = ctx.get('i', '')
-    if ip:
-        for line in ip.split('\n'):
-            if 'IPv4' in line:
-                print(f"  IP         : {line.split(':')[-1].strip()}")
-                break
-    print("-"*40)
-    return ctx
-
-def run_extreme():
-    print("\n[MODE] EXTREME SCAN\n" + "-"*40)
-    from engine.scenario_engine import ScenarioRunner, Scenario, ScenarioStep
-    from agents.code_agents import cmd_exec_agent
-    
-    class S(Scenario):
-        name = "Extreme"
-        steps = [
-            # System Info
-            ScenarioStep(step_name="SYS", agent_name="cmd_exec_agent", instruction_template="systeminfo", save_output_to_context_key="sys"),
-            # Network + Process Correlation
-            ScenarioStep(step_name="NET", agent_name="cmd_exec_agent", instruction_template="netstat -ano", save_output_to_context_key="net"),
-            ScenarioStep(step_name="PROC", agent_name="cmd_exec_agent", instruction_template="tasklist", save_output_to_context_key="proc"),
-            # Vulnerability Audit (Using systeminfo - has hotfixes)
-            # Persistence Deep-Dive
-            ScenarioStep(step_name="REG_RUN", agent_name="cmd_exec_agent", instruction_template="reg query HKLM\\Software\\Microsoft\\Windows\\CurrentVersion\\Run", save_output_to_context_key="reg_run"),
-            ScenarioStep(step_name="REG_RONCE", agent_name="cmd_exec_agent", instruction_template="reg query HKLM\\Software\\Microsoft\\Windows\\CurrentVersion\\RunOnce", save_output_to_context_key="reg_runonce"),
-            # Service Exploitation Check
-            ScenarioStep(step_name="SERV_DETAIL", agent_name="cmd_exec_agent", instruction_template="sc queryex type= service state= all", save_output_to_context_key="serv_detail"),
-            # Tasks & Services
-            ScenarioStep(step_name="SERV", agent_name="cmd_exec_agent", instruction_template="sc query", save_output_to_context_key="serv"),
-            ScenarioStep(step_name="TASK", agent_name="cmd_exec_agent", instruction_template="schtasks /query /fo LIST /v", save_output_to_context_key="task"),
-            # Users & Admin
-            ScenarioStep(step_name="USR", agent_name="cmd_exec_agent", instruction_template="net user", save_output_to_context_key="usr"),
-            ScenarioStep(step_name="ADM", agent_name="cmd_exec_agent", instruction_template="net localgroup administrators", save_output_to_context_key="adm"),
-            # Security
-            ScenarioStep(step_name="FW", agent_name="cmd_exec_agent", instruction_template="netsh advfirewall show allprofiles", save_output_to_context_key="fw"),
-            ScenarioStep(step_name="DRV", agent_name="cmd_exec_agent", instruction_template="driverquery", save_output_to_context_key="drv"),
-            ScenarioStep(step_name="ARP", agent_name="cmd_exec_agent", instruction_template="arp -a", save_output_to_context_key="arp"),
-        ]
-    
-    ctx = ScenarioRunner({"cmd_exec_agent": cmd_exec_agent}).run(S())
-    
-    # Extract key info with EXTREME analysis
-    print(f"  [+] SYSTEM    : {len(ctx.get('sys',''))} bytes")
-    print(f"  [+] NETSTAT  : {len(ctx.get('net',''))} bytes (PID mapped)")
-    print(f"  [+] PROCESSES: {len(ctx.get('proc',''))} bytes")
-    print(f"  [+] SERVICES : {len(ctx.get('serv_detail',''))} bytes (exploit check)")
-    print(f"  [+] REG_RUN  : {len(ctx.get('reg_run',''))} bytes (persistence)")
-    print(f"  [+] TASKS    : {len(ctx.get('task',''))} bytes")
-    print(f"  [+] USERS    : {len(ctx.get('usr',''))} bytes")
-    print(f"  [+] DRIVERS  : {len(ctx.get('drv',''))} bytes")
-    print("-"*40)
-    return ctx
-
-def run_jarvis():
-    print("\n[MODE] JARVIS - AI Assistant\n")
-    from interactive_session import run_interactive
-    run_interactive()
+def run_quick():
+    from cyberllm.core.scanner import Scanner
+    s = Scanner()
+    print("\n[QUICK INFO]")
+    print("-" * 40)
+    h = s.run_safe("hostname")
+    w = s.run_safe("whoami")
+    i = s.run_safe("ipconfig")
+    print(f"  Hostname: {h['output'].strip()}")
+    print(f"  User: {w['output'].strip()}")
+    ip_lines = [l for l in i['output'].split('\n') if 'IPv4' in l]
+    if ip_lines:
+        print(f"  IP: {ip_lines[0].split(':')[-1].strip()}")
+    print("-" * 40)
 
 def run_network():
-    print("\n[MODE] NETWORK SCAN\n" + "-"*40)
-    from engine.scenario_engine import ScenarioRunner, Scenario, ScenarioStep
-    from agents.code_agents import cmd_exec_agent
-    
-    class S(Scenario):
-        name = "Network"
-        steps = [
-            ScenarioStep(step_name="IP", agent_name="cmd_exec_agent", instruction_template="ipconfig", save_output_to_context_key="ip"),
-            ScenarioStep(step_name="NET", agent_name="cmd_exec_agent", instruction_template="netstat -ano", save_output_to_context_key="net"),
-            ScenarioStep(step_name="ARP", agent_name="cmd_exec_agent", instruction_template="arp -a", save_output_to_context_key="arp"),
-            ScenarioStep(step_name="RT", agent_name="cmd_exec_agent", instruction_template="route print", save_output_to_context_key="rt"),
-            ScenarioStep(step_name="DNS", agent_name="cmd_exec_agent", instruction_template="ipconfig /displaydns", save_output_to_context_key="dns"),
-        ]
-    
-    ctx = ScenarioRunner({"cmd_exec_agent": cmd_exec_agent}).run(S())
-    
-    ip = ctx.get('ip', '')
-    ipv4 = 'N/A'
-    for line in ip.split('\n'):
-        if 'IPv4' in line:
-            ipv4 = line.split(':')[-1].strip()
-            break
-    
-    print(f"  IP         : {ipv4}")
-    print(f"  NETSTAT    : {len(ctx.get('net',''))} bytes")
-    print(f"  ARP        : {len(ctx.get('arp',''))} bytes")
-    print(f"  ROUTES     : {len(ctx.get('rt',''))} bytes")
-    print("-"*40)
-    return ctx
+    from cyberllm.core.scanner import Scanner
+    s = Scanner()
+    print("\n[NETWORK SCAN]")
+    print("-" * 40)
+    net = s.run_safe("network")
+    print(net['output'][:2000])
+    print("-" * 40)
 
-def run_user_audit():
-    print("\n[MODE] USER AUDIT\n" + "-"*40)
-    from engine.scenario_engine import ScenarioRunner, Scenario, ScenarioStep
-    from agents.code_agents import cmd_exec_agent
-    
-    class S(Scenario):
-        name = "UserAudit"
-        steps = [
-            ScenarioStep(step_name="USR", agent_name="cmd_exec_agent", instruction_template="net user", save_output_to_context_key="usr"),
-            ScenarioStep(step_name="ADM", agent_name="cmd_exec_agent", instruction_template="net localgroup administrators", save_output_to_context_key="adm"),
-            ScenarioStep(step_name="GST", agent_name="cmd_exec_agent", instruction_template="net user guest", save_output_to_context_key="gst"),
-            ScenarioStep(step_name="POL", agent_name="cmd_exec_agent", instruction_template="net accounts", save_output_to_context_key="pol"),
-        ]
-    
-    ctx = ScenarioRunner({"cmd_exec_agent": cmd_exec_agent}).run(S())
-    
-    adm = ctx.get('adm', '')
-    admins = [l.strip() for l in adm.split('\n') if l.strip() and '----' not in l and 'Alias' not in l and 'Comment' not in l and 'Members' not in l]
-    
-    print(f"  USERS      : {len(ctx.get('usr','').splitlines())} accounts")
-    print(f"  ADMINS     : {', '.join(admins[:5])}")
-    print(f"  GUEST      : {'Disabled' if 'Account active               No' in ctx.get('gst','') else 'Active'}")
-    print("-"*40)
-    return ctx
+def run_users():
+    from cyberllm.core.scanner import Scanner
+    s = Scanner()
+    print("\n[USER AUDIT]")
+    print("-" * 40)
+    users = s.run_safe("users")
+    admins = s.run_safe("admins")
+    print("USERS:")
+    print(users['output'][:1000])
+    print("\nADMINS:")
+    print(admins['output'])
+    print("-" * 40)
 
-def run_threat_scan():
-    print("\n[MODE] THREAT SCAN\n" + "-"*40)
-    from engine.scenario_engine import ScenarioRunner, Scenario, ScenarioStep
-    from agents.code_agents import cmd_exec_agent
-    
-    class S(Scenario):
-        name = "Threat"
-        steps = [
-            ScenarioStep(step_name="PROC", agent_name="cmd_exec_agent", instruction_template="tasklist", save_output_to_context_key="proc"),
-            ScenarioStep(step_name="SERV", agent_name="cmd_exec_agent", instruction_template="sc query", save_output_to_context_key="serv"),
-            ScenarioStep(step_name="NET", agent_name="cmd_exec_agent", instruction_template="netstat -ano", save_output_to_context_key="net"),
-            ScenarioStep(step_name="REG", agent_name="cmd_exec_agent", instruction_template="reg query HKLM\\Software\\Microsoft\\Windows\\CurrentVersion\\Run", save_output_to_context_key="reg"),
-            ScenarioStep(step_name="TASK", agent_name="cmd_exec_agent", instruction_template="schtasks /query /fo LIST /v", save_output_to_context_key="task"),
-            ScenarioStep(step_name="FW", agent_name="cmd_exec_agent", instruction_template="netsh advfirewall show allprofiles", save_output_to_context_key="fw"),
-        ]
-    
-    ctx = ScenarioRunner({"cmd_exec_agent": cmd_exec_agent}).run(S())
-    
-    print(f"  PROCESSES  : {len(ctx.get('proc',''))} bytes")
-    print(f"  SERVICES   : {len(ctx.get('serv',''))} bytes")
-    print(f"  NETWORK    : {len(ctx.get('net',''))} bytes")
-    print(f"  REGISTRY   : {len(ctx.get('reg',''))} bytes")
-    print(f"  TASKS      : {len(ctx.get('task',''))} bytes")
-    print(f"  FIREWALL   : {len(ctx.get('fw',''))} bytes")
-    print("-"*40)
-    return ctx
+def run_processes():
+    from cyberllm.core.scanner import Scanner
+    s = Scanner()
+    print("\n[PROCESSES]")
+    print("-" * 40)
+    procs = s.get_processes()[:20]
+    for p in procs:
+        print(f"  {p.get('pid', '?')}: {p.get('name', '?')} | CPU: {p.get('cpu_percent', 0)}% | MEM: {p.get('memory_percent', 0):.1f}%")
+    print("-" * 40)
 
-def run_all_scan():
-    print("\n[MODE] FULL SCAN\n" + "-"*40)
-    from engine.scenario_engine import ScenarioRunner, Scenario, ScenarioStep
-    from agents.code_agents import cmd_exec_agent
-    
-    class S(Scenario):
-        name = "Full"
-        steps = [
-            ScenarioStep(step_name="SYS", agent_name="cmd_exec_agent", instruction_template="systeminfo", save_output_to_context_key="sys"),
-            ScenarioStep(step_name="IP", agent_name="cmd_exec_agent", instruction_template="ipconfig", save_output_to_context_key="ip"),
-            ScenarioStep(step_name="NET", agent_name="cmd_exec_agent", instruction_template="netstat -ano", save_output_to_context_key="net"),
-            ScenarioStep(step_name="ARP", agent_name="cmd_exec_agent", instruction_template="arp -a", save_output_to_context_key="arp"),
-            ScenarioStep(step_name="USR", agent_name="cmd_exec_agent", instruction_template="net user", save_output_to_context_key="usr"),
-            ScenarioStep(step_name="ADM", agent_name="cmd_exec_agent", instruction_template="net localgroup administrators", save_output_to_context_key="adm"),
-            ScenarioStep(step_name="PROC", agent_name="cmd_exec_agent", instruction_template="tasklist", save_output_to_context_key="proc"),
-            ScenarioStep(step_name="SERV", agent_name="cmd_exec_agent", instruction_template="sc query", save_output_to_context_key="serv"),
-            ScenarioStep(step_name="REG", agent_name="cmd_exec_agent", instruction_template="reg query HKLM\\Software\\Microsoft\\Windows\\CurrentVersion\\Run", save_output_to_context_key="reg"),
-            ScenarioStep(step_name="TASK", agent_name="cmd_exec_agent", instruction_template="schtasks /query /fo LIST /v", save_output_to_context_key="task"),
-            ScenarioStep(step_name="FW", agent_name="cmd_exec_agent", instruction_template="netsh advfirewall show allprofiles", save_output_to_context_key="fw"),
-            ScenarioStep(step_name="DRV", agent_name="cmd_exec_agent", instruction_template="driverquery", save_output_to_context_key="drv"),
-        ]
-    
-    ctx = ScenarioRunner({"cmd_exec_agent": cmd_exec_agent}).run(S())
-    
-    print(f"  SYSTEM     : {len(ctx.get('sys',''))} bytes")
-    print(f"  NETWORK    : {len(ctx.get('net',''))} bytes")
-    print(f"  USERS      : {len(ctx.get('usr',''))} bytes")
-    print(f"  PROCESSES  : {len(ctx.get('proc',''))} bytes")
-    print(f"  SERVICES   : {len(ctx.get('serv',''))} bytes")
-    print(f"  REGISTRY   : {len(ctx.get('reg',''))} bytes")
-    print(f"  TASKS      : {len(ctx.get('task',''))} bytes")
-    print(f"  DRIVERS    : {len(ctx.get('drv',''))} bytes")
-    print(f"  FIREWALL   : {len(ctx.get('fw',''))} bytes")
-    print("-"*40)
-    return ctx
+def run_services():
+    from cyberllm.core.scanner import Scanner
+    s = Scanner()
+    print("\n[SERVICES]")
+    print("-" * 40)
+    serv = s.run_safe("services")
+    print(serv['output'][:2000])
+    print("-" * 40)
+
+def run_full():
+    from cyberllm.core.scanner import Scanner
+    s = Scanner()
+    print("\n[FULL SCAN] Running...")
+    result = s.full_scan()
+    print("\n[FULL SCAN COMPLETE]")
+    print("-" * 40)
+    for key, value in result.items():
+        print(f"  {key}: {len(str(value))} bytes")
+    print("-" * 40)
+
+def run_jarvis():
+    import jarvis
+    jarvis.main()
 
 def main():
     print_banner()
+    print_menu()
     
-    # Default to local if available, else API
-    if OLLAMA_AVAILABLE:
-        set_llm_mode(True)
-    else:
-        set_llm_mode(False)
+    use_local = OLLAMA_AVAILABLE
     
-    modes = {1: run_simple, 2: run_extreme, 3: run_jarvis, 4: run_network, 
-             5: run_user_audit, 6: run_threat_scan, 7: run_all_scan}
+    modes = {
+        "1": ("QUICK", run_quick),
+        "2": ("NETWORK", run_network),
+        "3": ("USERS", run_users),
+        "4": ("PROCESSES", run_processes),
+        "5": ("SERVICES", run_services),
+        "6": ("FULL", run_full),
+        "J": ("JARVIS", run_jarvis),
+    }
+    
     while True:
-        print_menu()
-        choice = input("Select [L/A/0-7]: ").strip().upper()
+        try:
+            choice = input("Select [0/A/L/J]: ").strip().upper()
+        except (EOFError, KeyboardInterrupt):
+            print("\n[+] Goodbye!")
+            break
         
-        # Handle combined input like "A3", "3A", "A-3", "3-A", "A/3"
-        # First check for L or A prefix/suffix
-        mode_choice = choice
-        for sep in ['-', '/', '_']:
-            if sep in choice:
-                parts = choice.split(sep)
-                for p in parts:
-                    if p in ['L', 'A']:
-                        if p == 'L' and OLLAMA_AVAILABLE:
-                            set_llm_mode(True)
-                            choice = choice.replace(p, '').replace(sep, '')
-                        elif p == 'A':
-                            set_llm_mode(False)
-                            choice = choice.replace(p, '').replace(sep, '')
-                break
-        
-        # Check if just L or A
-        if choice == "L":
-            if OLLAMA_AVAILABLE:
-                set_llm_mode(True)
-            else:
-                print("[!] Ollama not running. Start Ollama first.")
-            continue
-        elif choice == "A":
-            set_llm_mode(False)
-            continue
-        elif choice == "0" or choice == "EXIT":
+        if choice == "0":
             print("\n[+] Goodbye!\n")
             break
         
-        # Try to parse as number
-        try:
-            warnings.filterwarnings("ignore")
-            # Remove any non-digits
-            num_str = ''.join(c for c in choice if c.isdigit())
-            if num_str:
-                key = int(num_str)
-                if key in modes:
-                    modes[key]()
-                else:
-                    print("[!] Invalid mode")
-            else:
-                print("[!] Invalid")
-        except Exception as e:
-            print(f"\n[ERROR] {e}\n")
+        if choice == "L":
+            use_local = True
+            os.environ['USE_LOCAL_LLM'] = 'true'
+            print("[+] Switched to LOCAL mode")
+            continue
+        
+        if choice == "A":
+            use_local = False
+            os.environ['USE_LOCAL_LLM'] = 'false'
+            print("[+] Switched to API mode")
+            continue
+        
+        if choice == "J":
+            run_jarvis()
+            print_banner()
+            print_menu()
+            continue
+        
+        if choice in modes:
+            try:
+                modes[choice][1]()
+            except Exception as e:
+                print(f"[!] Error: {e}")
+        else:
+            print("[!] Invalid option")
 
 if __name__ == "__main__":
-    import argparse
-    parser = argparse.ArgumentParser()
-    parser.add_argument('mode', nargs='?', default='')
-    parser.add_argument('--local', action='store_true', help='Use local Ollama model')
-    parser.add_argument('--api', action='store_true', help='Use Groq API')
-    args = parser.parse_args()
-    
-    if args.local:
-        set_llm_mode(True)
-    elif args.api:
-        set_llm_mode(False)
-    
-    if args.mode:
-        print_banner()
-        if OLLAMA_AVAILABLE and not args.api:
-            set_llm_mode(True)
-        else:
-            set_llm_mode(False)
-        modes = {1: run_simple, 2: run_extreme, 3: run_jarvis, 4: run_network, 
-                 5: run_user_audit, 6: run_threat_scan, 7: run_all_scan}
-        try:
-            key = int(args.mode) if args.mode.isdigit() else 0
-            if key in modes:
-                modes[key]()
-            else:
-                print("[!] Invalid mode")
-        except Exception as e:
-            print(f"[ERROR] {e}")
-    else:
-        main()
+    main()

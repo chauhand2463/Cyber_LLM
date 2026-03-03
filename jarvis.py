@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 """
 CyberLLM - JARVIS AI Assistant
-Main entry point with Local/API LLM support
+Direct interactive AI assistant
 """
 import os
 import sys
@@ -10,7 +10,6 @@ import io
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
-# Fix Windows encoding
 if sys.platform == "win32":
     try:
         sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
@@ -38,43 +37,42 @@ def print_banner():
   [+] CyberLLM SECURITY AGENT v2.0
   [+] JARVIS AI Assistant
   """)
-    if OLLAMA_AVAILABLE:
-        print("  [+] Ollama: DETECTED")
-    else:
-        print("  [+] Ollama: Not running")
+    print(f"  [+] Ollama: {'Available' if OLLAMA_AVAILABLE else 'Not running'}")
 
 def print_help():
     print("""
-AVAILABLE COMMANDS:
-  system info     - Get system information
-  whoami          - Current user details
-  network         - Network connections
-  ports           - Open ports
-  processes       - Running processes
-  users           - List users
-  admins          - List administrators
-  services        - Running services
-  startup         - Startup programs
-  firewall        - Firewall status
-  full scan       - Complete system scan
-  threat hunt     - Quick threat scan
-  
-  CVE-2024-xxx   - Lookup CVE
-  8.8.8.8        - IP lookup
-  https://...    - Web scrape
-  
-  help            - Show this help
-  clear           - Clear screen
-  exit            - Exit JARVIS
+COMMANDS:
+  Scans:
+    network      - Network connections
+    ports        - Open ports
+    processes    - Running processes
+    users        - List users
+    admins       - List admins
+    services     - Running services
+    startup      - Startup programs
+    firewall     - Firewall status
+    full scan    - Complete system scan
+    
+  OSINT:
+    CVE-2024-xxx - CVE lookup
+    8.8.8.8     - IP lookup
+    https://..  - Web scrape
+    
+  General:
+    help         - Show this help
+    local / api - Switch LLM mode
+    clear        - Clear screen
+    exit         - Exit
 """)
 
 def main():
     print_banner()
+    print()
     
     use_local = OLLAMA_AVAILABLE
     os.environ['USE_LOCAL_LLM'] = 'true' if use_local else 'false'
     
-    print(f"\n[+] Mode: {'LOCAL (Ollama)' if use_local else 'API (Groq)'}")
+    print(f"[+] Mode: {'LOCAL (Ollama)' if use_local else 'API (Groq)'}")
     print("[+] Type 'help' for commands\n")
     
     try:
@@ -122,14 +120,14 @@ def main():
             print("[+] Switched to API mode")
             continue
         
-        print("\n" + "="*50)
+        print()
         
         try:
             result = jarvis.process(user_input)
             
             intent = result.get('intent', 'UNKNOWN')
-            print(f"  [{intent}]")
-            print("="*50)
+            print(f"[{intent}]")
+            print("-" * 40)
             
             if 'analysis' in result:
                 print(str(result['analysis']))
