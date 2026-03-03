@@ -33,36 +33,64 @@ def print_menu():
 
 def print_help():
     print("""
-Available Commands:
-  exit, quit, q     - Exit JARVIS
-  clear, cls        - Clear screen  
-  help, ?           - Show this help
-  menu              - Show main menu
-  
-Security Scans:
-  network ports     - Check open ports
-  netstat           - View network connections
-  ipconfig          - View IP configuration
-  list admins       - List administrators
-  users             - List all users
-  system info       - Get system information
-  sysinfo           - Get system information
-  processes         - List running processes
-  services          - List Windows services
-  startup           - Check startup programs
-  registry          - Check registry run keys
-  firewall          - Check firewall rules
-  threats           - Scan for threats
-  malware           - Check for malware
-  persistence       - Check persistence mechanisms
-  
-Web/OSINT:
-  https://...       - Scrape any URL
-  CVE-2024-...     - Lookup CVE details
-  8.8.8.8          - Lookup IP info
-  
-General:
-  Any question     - Ask JARVIS anything
+================================================================================
+                    JARVIS AI CAPABILITIES
+================================================================================
+
+[ BASIC SECURITY SCANS ]
+--------------------------------------------------------------------------------
+  * network ports     - Check open ports
+  * netstat          - View all network connections
+  * ipconfig         - View IP configuration
+  * list admins      - List administrator accounts
+  * users            - List all user accounts
+  * system info      - Get system information
+  * processes        - List running processes
+  * services         - List Windows services
+  * startup          - Check startup programs
+  * registry         - Check registry run keys
+  * firewall         - Check firewall rules
+  * threats          - Scan for threats/malware
+  * malware          - Check for malware indicators
+  * persistence      - Check persistence mechanisms
+
+[ ADVANCED SECURITY OPERATIONS ]
+--------------------------------------------------------------------------------
+  * risk assessment       - Identify assets, threats, vulnerabilities
+  * vulnerability scan    - Scan for known vulnerabilities
+  * security hardening    - Check security configuration
+  * iam audit             - Identity & access management
+  * patch management      - Check for missing patches
+  * incident response     - Gather forensic artifacts
+  * data protection       - Check encryption & backups
+  * compliance check      - NIST/CIS/ISO compliance
+  * third party risk     - Assess vendor risks
+  * cloud security        - Check cloud configuration
+  * web security          - Scan URL for vulnerabilities
+  * pen test             - Penetration test simulation
+
+[ WEB/OSINT TOOLS ]
+--------------------------------------------------------------------------------
+  * https://example.com  - Scrape and analyze any URL
+  * CVE-2024-1234        - Lookup CVE vulnerability details
+  * 8.8.8.8              - Lookup IP geolocation info
+
+[ GENERAL AI ASSISTANT ]
+--------------------------------------------------------------------------------
+  * Ask any question about cybersecurity
+  * Explain security concepts
+  * Get recommendations and best practices
+  * Learn about attack techniques
+  * Understand security tools and frameworks
+
+[ COMMANDS ]
+--------------------------------------------------------------------------------
+  * help, ?      - Show this menu
+  * menu         - Return to main menu
+  * clear, cls   - Clear screen
+  * back, exit   - Exit JARVIS
+
+================================================================================
 """)
 
 def format_output(data, intent):

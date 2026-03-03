@@ -2,13 +2,36 @@
 """
 CyberLLM - Unified Entry Point
 Single command to run the different framework in modes.
-Uses Groq's free API (no OpenAI calls).
+Supports both Local LLM (Ollama) and API (Groq/OpenAI).
 """
 import sys
 import os
 import warnings
+import urllib.request
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+
+# Check for Ollama on startup
+def check_ollama():
+    """Check if Ollama is running."""
+    try:
+        urllib.request.urlopen('http://localhost:11434', timeout=2)
+        return True
+    except:
+        return False
+
+OLLAMA_AVAILABLE = check_ollama()
+USE_LOCAL_LLM = False
+
+def set_llm_mode(use_local: bool):
+    """Set the LLM mode and update environment."""
+    global USE_LOCAL_LLM
+    USE_LOCAL_LLM = use_local
+    os.environ['USE_LOCAL_LLM'] = 'true' if use_local else 'false'
+    if use_local:
+        print(f"\n[+] LLM Mode: Local (Ollama - gpt-oss-20b)")
+    else:
+        print(f"\n[+] LLM Mode: API (Groq)")
 
 def print_banner():
     print(r"""
@@ -19,19 +42,26 @@ def print_banner():
   \____/_/\___/\___/ \____/_/ /_/ \____/_/   |_/____/\___/   
                                                             
   [+] CyberLLM SECURITY AGENT v1.0
-  [+] Free API Edition (Groq) - No OpenAI
-""")
+  [+] Local + API Edition
+  """)
+    if OLLAMA_AVAILABLE:
+        print(f"  [+] Ollama: DETECTED (Local LLM available)")
+    else:
+        print(f"  [+] Ollama: Not running (API mode only)")
 
 def print_menu():
     print("SELECT MODE:")
+    print("  [L]  LOCAL    - Use local Ollama model")
+    print("  [A]  API      - Use Groq API")
+    print("  ─────────────────────────────")
     print("  [1] INFO      - Quick system info")
-    print("  [2] EXTREME  - Full threat hunt")
-    print("  [3] JARVIS   - AI Assistant")
-    print("  [4] NETWORK  - Network scan")
-    print("  [5] AUDIT    - User audit")
-    print("  [6] THREAT   - Threat scan")
-    print("  [7] FULL     - Complete scan")
-    print("  [0] EXIT     - Quit\n")
+    print("  [2] EXTREME   - Full threat hunt")
+    print("  [3] JARVIS    - AI Assistant")
+    print("  [4] NETWORK   - Network scan")
+    print("  [5] AUDIT     - User audit")
+    print("  [6] THREAT    - Threat scan")
+    print("  [7] FULL      - Complete scan")
+    print("  [0] EXIT      - Quit\n")
 
 def run_simple():
     print("\n[MODE] INFO SCAN\n" + "-"*40)
@@ -232,19 +262,60 @@ def run_all_scan():
 
 def main():
     print_banner()
+    
+    # Default to local if available, else API
+    if OLLAMA_AVAILABLE:
+        set_llm_mode(True)
+    else:
+        set_llm_mode(False)
+    
     modes = {1: run_simple, 2: run_extreme, 3: run_jarvis, 4: run_network, 
              5: run_user_audit, 6: run_threat_scan, 7: run_all_scan}
     while True:
         print_menu()
-        choice = input("Select [0-7]: ").strip()
-        if choice == "0":
+        choice = input("Select [L/A/0-7]: ").strip().upper()
+        
+        # Handle combined input like "A3", "3A", "A-3", "3-A", "A/3"
+        # First check for L or A prefix/suffix
+        mode_choice = choice
+        for sep in ['-', '/', '_']:
+            if sep in choice:
+                parts = choice.split(sep)
+                for p in parts:
+                    if p in ['L', 'A']:
+                        if p == 'L' and OLLAMA_AVAILABLE:
+                            set_llm_mode(True)
+                            choice = choice.replace(p, '').replace(sep, '')
+                        elif p == 'A':
+                            set_llm_mode(False)
+                            choice = choice.replace(p, '').replace(sep, '')
+                break
+        
+        # Check if just L or A
+        if choice == "L":
+            if OLLAMA_AVAILABLE:
+                set_llm_mode(True)
+            else:
+                print("[!] Ollama not running. Start Ollama first.")
+            continue
+        elif choice == "A":
+            set_llm_mode(False)
+            continue
+        elif choice == "0" or choice == "EXIT":
             print("\n[+] Goodbye!\n")
             break
+        
+        # Try to parse as number
         try:
             warnings.filterwarnings("ignore")
-            key = int(choice) if choice.isdigit() else 0
-            if key in modes:
-                modes[key]()
+            # Remove any non-digits
+            num_str = ''.join(c for c in choice if c.isdigit())
+            if num_str:
+                key = int(num_str)
+                if key in modes:
+                    modes[key]()
+                else:
+                    print("[!] Invalid mode")
             else:
                 print("[!] Invalid")
         except Exception as e:
@@ -254,10 +325,21 @@ if __name__ == "__main__":
     import argparse
     parser = argparse.ArgumentParser()
     parser.add_argument('mode', nargs='?', default='')
+    parser.add_argument('--local', action='store_true', help='Use local Ollama model')
+    parser.add_argument('--api', action='store_true', help='Use Groq API')
     args = parser.parse_args()
+    
+    if args.local:
+        set_llm_mode(True)
+    elif args.api:
+        set_llm_mode(False)
     
     if args.mode:
         print_banner()
+        if OLLAMA_AVAILABLE and not args.api:
+            set_llm_mode(True)
+        else:
+            set_llm_mode(False)
         modes = {1: run_simple, 2: run_extreme, 3: run_jarvis, 4: run_network, 
                  5: run_user_audit, 6: run_threat_scan, 7: run_all_scan}
         try:

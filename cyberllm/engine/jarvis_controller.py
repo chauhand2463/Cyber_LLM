@@ -135,13 +135,39 @@ class JarvisController:
             
             load_dotenv()
             
-            client = OpenAI(
-                api_key=os.getenv('GROQ_API_KEY') or os.getenv('OPENAI_API_KEY'),
-                base_url=os.getenv('OPENAI_API_BASE', 'https://api.groq.com/openai/v1')
-            )
+            # Auto-detect Ollama if available
+            use_local = os.getenv('USE_LOCAL_LLM', 'false').lower() == 'true'
+            if not use_local:
+                try:
+                    import urllib.request
+                    urllib.request.urlopen('http://localhost:11434', timeout=2)
+                    use_local = True
+                except:
+                    pass
+            
+            if use_local:
+                local_base_url = os.getenv('LOCAL_LLM_URL', 'http://localhost:11434/v1')
+                local_model = os.getenv('LOCAL_LLM_MODEL', 'gpt-oss-20b')
+                # Convert to Ollama format: gpt-oss-20b -> gpt-oss:20b
+                if ':' not in local_model and '-' in local_model:
+                    parts = local_model.rsplit('-', 1)
+                    if len(parts) == 2 and parts[1].endswith(('b', 'B')):
+                        local_model = f"{parts[0]}:{parts[1]}"
+                client = OpenAI(
+                    base_url=local_base_url,
+                    api_key=os.getenv('LOCAL_LLM_API_KEY', 'ollama')
+                )
+                model = local_model
+                print(f"[JARVIS] Using local model: {local_model}")
+            else:
+                client = OpenAI(
+                    api_key=os.getenv('GROQ_API_KEY') or os.getenv('OPENAI_API_KEY'),
+                    base_url=os.getenv('OPENAI_API_BASE', 'https://api.groq.com/openai/v1')
+                )
+                model = "llama-3.3-70b-versatile"
             
             response = client.chat.completions.create(
-                model="llama-3.3-70b-versatile",
+                model=model,
                 messages=[
                     {"role": "system", "content": "You are JARVIS, an elite AI assistant. Be helpful, concise, and smart. Answer questions directly."},
                     {"role": "user", "content": user_input}

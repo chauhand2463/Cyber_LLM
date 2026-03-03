@@ -5,17 +5,39 @@ import os
 # Get path to the script folder
 script_folder = os.path.dirname(os.path.abspath(__file__))
 working_folder = os.path.join(script_folder, "../" + utils.constants.LLM_WORKING_FOLDER)
-llm_config = {
-    "model": utils.constants.OPENAI_MODEL_NAME or "llama-3.3-70b-versatile",
-    "base_url": utils.constants.OPENAI_API_BASE or "https://api.groq.com/openai/v1",
-    "api_key": utils.constants.GROQ_API_KEY or utils.constants.OPENAI_API_KEY,
-    "cache_seed": None,
-    "temperature": 0.2,
-    "max_tokens": 256,
-}
+
+# Auto-detect Ollama if available
+use_local = utils.constants.USE_LOCAL_LLM
+if not use_local:
+    try:
+        import urllib.request
+        urllib.request.urlopen('http://localhost:11434', timeout=2)
+        use_local = True
+    except:
+        pass
+
+if use_local:
+    llm_config = {
+        "model": utils.constants.LOCAL_LLM_MODEL or "gpt-oss:20b",
+        "base_url": utils.constants.LOCAL_LLM_URL or "http://localhost:11434/v1",
+        "api_key": utils.constants.LOCAL_LLM_API_KEY or "ollama",
+        "cache_seed": None,
+        "temperature": 0.2,
+        "max_tokens": 256,
+    }
+    print(f"[SYSTEM] Using local LLM: {utils.constants.LOCAL_LLM_MODEL}")
+else:
+    llm_config = {
+        "model": utils.constants.OPENAI_MODEL_NAME or "llama-3.3-70b-versatile",
+        "base_url": utils.constants.OPENAI_API_BASE or "https://api.groq.com/openai/v1",
+        "api_key": utils.constants.GROQ_API_KEY or utils.constants.OPENAI_API_KEY,
+        "cache_seed": None,
+        "temperature": 0.2,
+        "max_tokens": 256,
+    }
 
 fast_llm_config = llm_config.copy()
-fast_llm_config["model"] = "llama-3.1-8b-instant"
+fast_llm_config["model"] = utils.constants.LOCAL_LLM_MODEL if use_local else "llama-3.1-8b-instant"
 
 # if utils.constants.OPENAI_API_BASE:
 #     llm_config["base_url"] = utils.constants.OPENAI_API_BASE
