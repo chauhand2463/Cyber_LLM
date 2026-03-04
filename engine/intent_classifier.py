@@ -4,7 +4,7 @@ import re
 
 class IntentClassifier:
     """
-    Comprehensive intent classifier for CyberLLM JARVIS.
+    Comprehensive intent classifier for CyberLLM ARTEMIS.
     Handles all cybersecurity domains including Risk Assessment, Vulnerability Management,
     Penetration Testing, Incident Response, Compliance, and more.
     """

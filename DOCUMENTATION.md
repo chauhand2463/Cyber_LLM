@@ -1,272 +1,366 @@
-# CyberLLM - Complete Documentation
+# ARTEMIS - Advanced Cybersecurity AI Agent
+
+<p align="center">
+  <img src="https://img.shields.io/badge/Version-2.0-green" alt="Version">
+  <img src="https://img.shields.io/badge/Python-3.9+-blue" alt="Python">
+  <img src="https://img.shields.io/badge/License-MIT-yellow" alt="License">
+</p>
+
+---
 
 ## Table of Contents
-1. [Features](#features)
-2. [How It Works](#how-it-works)
-3. [Project Structure](#project-structure)
-4. [Usage](#usage)
-5. [Technical Details](#technical-details)
+
+1. [Overview](#overview)
+2. [Features](#features)
+3. [Installation](#installation)
+4. [Quick Start](#quick-start)
+5. [Menu Options](#menu-options)
+6. [Penetration Testing](#penetration-testing)
+7. [AI Assistant](#ai-assistant)
+8. [Configuration](#configuration)
+9. [Troubleshooting](#troubleshooting)
+
+---
+
+## Overview
+
+**ARTEMIS** (Advanced Research and Modeling for Ethical Intelligence System) is an advanced AI-powered cybersecurity assistant designed for security professionals, penetration testers, and system administrators.
+
+### Key Features
+
+- **Dual LLM Support** - Local (Ollama) or Cloud (Groq API)
+- **System Scanning** - Quick system info, processes, services
+- **Network Analysis** - Connections, ports, firewall status
+- **User Auditing** - User enumeration, privilege analysis
+- **Penetration Testing** - Nmap, Nikto, Nuclei, Enum4linux
+- **CTI Integration** - CVE lookup, threat intelligence
+- **AI-Powered Analysis** - Natural language processing
 
 ---
 
 ## Features
 
-### 1. JARVIS AI Assistant
-- **Natural Language Processing**: Ask questions in plain English
-- **Security Scanning**: Detects security-related commands and runs appropriate scans
-- **General Q&A**: Can answer any question using Groq's free AI
-- **File Listing**: Scan directories like Downloads, Desktop, Documents
+### 1. System Scanning
+- Quick system info (hostname, user, IP)
+- Running processes with CPU/Memory
+- Windows services
+- Registry startup entries
+- Firewall configuration
 
-### 2. 7 Scan Modes
+### 2. Network Scanning
+- All network connections
+- Open ports listing
+- Routing table
 
-| Mode | Description |
-|------|-------------|
-| **INFO** | Quick system info (hostname, IP, OS, user) |
-| **EXTREME** | Full threat hunt (system, network, processes, services, registry, tasks, users, drivers, firewall) |
-| **JARVIS** | AI Assistant - chat naturally |
-| **NETWORK** | Network scan (IP, netstat, ARP, routes) |
-| **AUDIT** | User audit (users, admins, guest, policies) |
-| **THREAT** | Threat scan (processes, services, network, registry, tasks, firewall) |
-| **FULL** | Complete security scan |
+### 3. User Auditing
+- List all local users
+- Administrator group members
+- Privilege analysis
 
-### 3. Key Capabilities
+### 4. Penetration Testing
+- **Nmap** - Port scanning
+- **Nikto** - Web vulnerability scanner
+- **Nuclei** - Template-based vulnerability scanner
+- **Enum4linux** - SMB enumeration
+- **Exploit Search** - SearchSploit integration
 
-- **Intent Classification**: Automatically detects what you want to do
-- **Local Execution**: Runs Windows commands directly (no API for scans)
-- **AI Analysis**: Uses Groq's free API for intelligent responses
-- **Memory Storage**: Stores scan results in SQLite database
-- **Error Recovery**: Automatically handles failed commands
+### 5. Threat Intelligence
+- NIST CVE lookup
+- CVE enrichment with threat intel
+- Recent vulnerabilities tracking
+- IP reputation checking
 
----
-
-## How It Works
-
-### 1. Main Entry Point (main.py)
-
-When you run `python main.py`:
-1. Displays CyberLLM banner
-2. Shows menu with 7 options
-3. Waits for user Exec input
-4.utes selected mode
-
-### 2. Menu System
-
-```
-Select [0-7]: 1
-```
-
-Each mode maps to a function:
-- `1` → `run_simple()` - Quick info
-- `2` → `run_extreme()` - Full scan
-- `3` → `run_jarvis()` - AI assistant
-- `4` → `run_network()` - Network scan
-- `5` → `run_user_audit()` - User audit
-- `6` → `run_threat_scan()` - Threat scan
-- `7` → `run_all_scan()` - Complete scan
-
-### 3. Scenario Engine
-
-The `ScenarioRunner` executes steps sequentially:
-
-```python
-class Scenario:
-    name = "Scan Name"
-    steps = [
-        ScenarioStep(
-            step_name="Step1",
-            agent_name="cmd_exec_agent",
-            instruction_template="command to run",
-            save_output_to_context_key="result_key"
-        ),
-    ]
-```
-
-### 4. Command Execution (cmd_exec_agent)
-
-```
-User Input → Intent Detection → Command Extraction → Local Execution → Result
-```
-
-Steps:
-1. Receives instruction (e.g., "Run 'netstat -ano'")
-2. Extracts actual command using regex
-3. Executes via `subprocess.run()`
-4. Returns output
-
-### 5. JARVIS Controller
-
-For mode 3 (JARVIS):
-
-```
-User Question → Intent Classifier → 
-    ├─ Known Intent → Run Security Scan → AI Analysis → Report
-    └─ Unknown Intent → Ask AI → Direct Answer
-```
-
-#### Intent Detection
-Detects these intents:
-- `FILE_SCAN` - "list files", "scan downloads"
-- `NETWORK_SCAN` - "check ports", "network scan"
-- `USER_AUDIT` - "audit admins", "list users"
-- `THREAT_HUNT` - "scan malware", "check threats"
-- `PERSISTENCE_CHECK` - "check registry", "startup"
-- `SYS_INFO` - "system info", "hostname"
-
-### 6. AI Integration
-
-Uses Groq's free API:
-- Model: `llama-3.3-70b-versatile`
-- Endpoint: `https://api.groq.com/openai/v1`
-- No OpenAI cost
+### 6. AI Assistant
+- Natural language commands
+- Automated task planning
+- Security analysis
+- Remediation recommendations
 
 ---
 
-## Project Structure
+## Installation
 
-```
-cyber-security-llm-agents/
-├── main.py                    # Entry point with menu
-├── interactive_session.py     # JARVIS chat interface
-├── autogen_compat.py         # AutoGen compatibility
-├── .env                      # API keys
-│
-├── agents/
-│   ├── code_agents.py        # CmdExecutor - runs local commands
-│   ├── text_agents.py        # Text analysis agent
-│   ├── coordinator_agents.py # Task coordination
-│   └── intelligence_agents.py # IOC extraction
-│
-├── engine/
-│   ├── scenario_engine.py    # Runs scenarios step by step
-│   ├── jarvis_controller.py # AI controller with intent detection
-│   ├── intent_classifier.py # Detects user intent
-│   ├── memory_store.py      # SQLite storage
-│   └── ...
-│
-├── scenarios/
-│   ├── definitions.py        # Basic scenarios
-│   ├── advanced_scenarios.py # Complex scenarios
-│   └── threat_hunt.py       # Threat hunting
-│
-├── tools/
-│   ├── code_tools.py        # Command execution
-│   └── memory_tools.py      # Memory queries
-│
-└── utils/
-    ├── constants.py          # Configuration
-    └── shared_config.py     # LLM config
-```
-
----
-
-## Usage
-
-### Basic Commands
+### Prerequisites
 
 ```bash
-# Interactive menu
+# Python 3.9+
+python --version
+
+# Optional: Ollama for local LLM
+# Download from https://ollama.ai
+```
+
+### Setup
+
+```bash
+# Clone repository
+git clone <repo-url>
+cd cyber-security-llm-agents
+
+# Install dependencies
+pip install -r requirements.txt
+
+# Configure .env file
+# See Configuration section
+```
+
+---
+
+## Quick Start
+
+### Option 1: Menu Interface
+
+```bash
 python main.py
-
-# Direct modes
-python main.py 1       # INFO
-python main.py 2       # EXTREME
-python main.py 3       # JARVIS
-python main.py 4       # NETWORK
-python main.py 5       # AUDIT
-python main.py 6       # THREAT
-python main.py 7       # FULL
 ```
 
-### JARVIS Examples
+### Option 2: AI Assistant
 
 ```bash
-python main.py 3
-```
-
-Then type:
-
-```
-JARVIS > check open ports
-JARVIS > audit admins
-JARVIS > list files in downloads
-JARVIS > what is malware
-JARVIS > how to secure my wifi
-JARVIS > who are you
+python artemis.py
 ```
 
 ---
 
-## Technical Details
+## Menu Options
 
-### Command Execution Flow
+### Main Menu
 
-1. **Input**: "Run 'netstat -ano'"
-2. **Extract**: `extract_command()` → "netstat -ano"
-3. **Execute**: `exec_shell_command()` → `subprocess.run()`
-4. **Return**: JSON with stdout, stderr, returncode
+```
+================================================================================
+                              MAIN MENU
+================================================================================
+  [1] SYSTEM SCANS      - Quick system information
+  [2] NETWORK SCAN      - Network connections and ports
+  [3] USER AUDIT        - User accounts and privileges
+  [4] PROCESSES         - Running processes
+  [5] SERVICES          - System services
+  [6] FULL SCAN         - Complete security scan
+--------------------------------------------------------------------------------
+  [E] EXTREME MODE     - Full penetration testing suite
+  [W] WEB SCAN         - Web application testing
+  [P] PENTEST          - All penetration testing tools
+--------------------------------------------------------------------------------
+  [A] ARTEMIS          - Interactive AI Assistant
+--------------------------------------------------------------------------------
+  [L] LOCAL            - Switch to local Ollama
+  [R] API              - Switch to Groq API
+--------------------------------------------------------------------------------
+  [D] DOCUMENTATION    - View complete documentation
+  [F] FEATURES         - View all features
+--------------------------------------------------------------------------------
+  [0] EXIT             - Quit
+================================================================================
+```
 
-### Intent Classification
+### System Scans
+| Option | Description |
+|--------|-------------|
+| 1 | Quick system info (hostname, user, IP) |
+| 4 | List running processes |
+| 5 | List system services |
 
-```python
-INTENTS = {
-    "NETWORK_SCAN": ["port", "netstat", "tcp", "connection", ...],
-    "USER_AUDIT": ["user", "admin", "group", ...],
-    "FILE_SCAN": ["file", "directory", "list", ...],
-    ...
+### Network Scans
+| Option | Description |
+|--------|-------------|
+| 2 | Network connections and ports |
+
+### User Auditing
+| Option | Description |
+|--------|-------------|
+| 3 | User accounts and admin groups |
+
+### Full Scan
+| Option | Description |
+|--------|-------------|
+| 6 | Complete security scan |
+
+---
+
+## Penetration Testing
+
+### EXTREME MODE [E]
+
+Comprehensive security assessment including:
+- Phase 1: System Reconnaissance
+- Phase 2: Network Analysis
+- Phase 3: Process Analysis
+- Phase 4: Service Enumeration
+- Phase 5: User Auditing
+- Phase 6: Persistence Check
+- Phase 7: Firewall Status
+
+### WEB SCAN [W]
+
+Web application testing:
+- **Nikto** - Web vulnerability scanner
+- **Nuclei** - Template-based scanner
+- **Full Web Assessment**
+
+### PENTEST [P]
+
+Full penetration testing tools:
+
+```
+Select tool:
+  [1] Nmap - Port Scanner
+  [2] Nikto - Web Vulnerability
+  [3] Nuclei - Template Scanner
+  [4] Enum4linux - SMB Enum
+  [5] Exploit Search
+  [6] Full Recon
+```
+
+### Usage Example
+
+```
+Select option: P
+
+[PENETRATION TESTING SUITE]
+Select tool:
+  [1] Nmap - Port Scanner
+  [2] Nikto - Web Vulnerability
+  [3] Nuclei - Template Scanner
+  [4] Enum4linux - SMB Enum
+  [5] Exploit Search
+  [6] Full Recon
+
+Choice: 1
+Enter target (IP/URL): 192.168.1.1
+
+[+] Running on 192.168.1.1...
+
+[RESULTS]
+{
+  "status": "success",
+  "target": "192.168.1.1",
+  "scan_type": "quick",
+  "output": "..."
 }
 ```
 
-### AI Analysis Prompt
+---
 
-JARVIS uses a concise format:
+## AI Assistant
+
+### Using ARTEMIS [A]
 
 ```
-**CRITICAL**: [Key threat in 1 line]
-**RED FLAGS**: [Max 3 bullet points]
-**ACTION**: [One fix command]
+Select option: A
 
-Max 50 words.
+ARTEMIS > help
+ARTEMIS > feature
+ARTEMIS > network
+ARTEMIS > CVE-2024-1234
+ARTEMIS > plan scan for vulnerabilities
+ARTEMIS > who is the president
 ```
 
-### API Configuration
+### Commands in ARTEMIS
 
-In `.env`:
 ```
-GROQ_API_KEY=your_groq_key_here
+Scans:
+  network, ports, processes, users, admins, services, startup, firewall, full scan
+
+CTI:
+  CVE-2024-xxxx, cve enrich, recent cves, threat IP
+
+PenTest:
+  scan TARGET, vuln TARGET, nikto URL, nuclei URL, exploit SEARCH
+
+AI:
+  plan TASK, history, audit
+
+General:
+  feature, help, local/api, clear, exit
+```
+
+---
+
+## Configuration
+
+### Environment Variables (.env)
+
+```bash
+# LOCAL LLM (Ollama)
+USE_LOCAL_LLM=true
+LOCAL_LLM_URL=http://localhost:11434/v1
+LOCAL_LLM_MODEL=gpt-oss-20b
+LOCAL_LLM_API_KEY=ollama
+
+# API LLM (Groq)
+USE_LOCAL_LLM=false
+GROQ_API_KEY=your_groq_api_key
 OPENAI_API_BASE=https://api.groq.com/openai/v1
-OPENAI_MODEL_NAME=llama-3.3-70b-versatile
+
+# Other
+WEB_SERVER_PORT=8800
+```
+
+### Switching Modes
+
+```
+[L] - Switch to Local (Ollama)
+[R] - Switch to API (Groq)
 ```
 
 ---
 
-## Security Notes
+## Troubleshooting
 
-- All scans run locally on your machine
-- No data sent to external servers (except AI questions)
-- Uses Windows built-in commands only
-- Results stored locally in SQLite
-- Payload generation is BLOCKED for external IPs
+### Ollama Not Running
+
+```bash
+# Start Ollama
+ollama serve
+
+# Pull model
+ollama pull gpt-oss-20b
+```
+
+### API Key Issues
+
+Ensure `.env` file exists with correct API key:
+```bash
+GROQ_API_KEY=your_key_here
+```
+
+### Import Errors
+
+```bash
+pip install -r requirements.txt
+```
 
 ---
 
-## Advanced Features
+## Model Information
 
-### CVE Database
-Local knowledge base of common vulnerabilities:
-- SMB: CVE-2020-0796 (SMBGhost), CVE-2017-0144 (EternalBlue)
-- RDP: CVE-2019-0708 (BlueKeep)
-- SSH: CVE-2023-48795 (RegreSSHion)
+### Local Model (Recommended)
+- **Model**: gpt-oss-20b
+- **Provider**: Ollama
+- **Benefits**: Privacy, offline use, no API costs
 
-### Banner Grabbing
-Service version detection for vulnerability assessment.
+### API Model (Cloud)
+- **Model**: llama-3.3-70b-versatile
+- **Provider**: Groq
+- **Benefits**: Faster, more powerful
 
-### Process-to-Network Correlation
-Match PIDs to ports to identify which process is communicating.
+---
 
-### Safe Payload Generation
-- Only generates for local/private networks (127.0.0.1, 10.x.x.x, 192.168.x.x)
-- Blocks external targets for safety
-- For authorized lab testing only
+## Safety & Compliance
+
+- All actions are logged
+- Safety checks on commands
+- Authorization verification
+- Audit trail maintained
+
+> **Note**: Only use for authorized security testing in controlled environments.
+
+---
+
+## License
+
+MIT License
 
 ---
 
@@ -276,6 +370,6 @@ Match PIDs to ports to identify which process is communicating.
 
 ---
 
-## License
-
-This is a security tool for educational and authorized testing purposes only.
+<div align="center">
+  <i>ARTEMIS v2.0 - Advanced AI-Powered Cybersecurity Assistant</i>
+</div>

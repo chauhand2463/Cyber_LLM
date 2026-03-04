@@ -6,7 +6,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-SYSTEM_PROMPT = """You are JARVIS - an intelligent AI assistant.
+SYSTEM_PROMPT = """You are ARTEMIS - an advanced intelligent AI assistant specialized in cybersecurity.
 
 GUIDELINES:
 1. Be helpful, concise, and direct
@@ -19,7 +19,7 @@ RESPONSE STYLE:
 """
 
 
-class JARVIS:
+class ARTEMIS:
     def __init__(self, use_local: bool = True):
         self.use_local = use_local
         self.client = None
@@ -43,17 +43,17 @@ class JARVIS:
                     api_key=os.getenv('LOCAL_LLM_API_KEY', 'ollama')
                 )
                 self.model = local_model
-                print(f"[JARVIS] Using LOCAL model: {local_model}")
+                print(f"[ARTEMIS] Using LOCAL model: {local_model}")
             else:
                 self.client = OpenAI(
                     api_key=os.getenv('GROQ_API_KEY') or os.getenv('OPENAI_API_KEY'),
                     base_url=os.getenv('OPENAI_API_BASE', 'https://api.groq.com/openai/v1')
                 )
                 self.model = "llama-3.3-70b-versatile"
-                print(f"[JARVIS] Using API model: {self.model}")
+                print(f"[ARTEMIS] Using API model: {self.model}")
                 
         except Exception as e:
-            print(f"[JARVIS] Client init error: {e}")
+            print(f"[ARTEMIS] Client init error: {e}")
             self.client = None
     
     def set_mode(self, use_local: bool):
@@ -115,7 +115,7 @@ IOCs: {', '.join(iocs)}
         return self.chat(prompt)
 
 
-class JarvisController:
+class ArtemisController:
     def __init__(self, use_local: bool = True):
         from cyberllm.core.scanner import Scanner
         from cyberllm.core.intent import IntentClassifier
@@ -126,7 +126,7 @@ class JarvisController:
         self.classifier = IntentClassifier()
         self.memory = MemoryEngine()
         self.osint = OSINT()
-        self.jarvis = JARVIS(use_local)
+        self.jarvis = ARTEMIS(use_local)
         
     def set_llm_mode(self, use_local: bool):
         self.jarvis.set_mode(use_local)

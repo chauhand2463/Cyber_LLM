@@ -44,7 +44,7 @@ class MemoryStore:
                 )
             ''')
             
-            # Knowledge Base for Learned Patterns (JARVIS Memory)
+            # Knowledge Base for Learned Patterns (ARTEMIS Memory)
             cursor.execute('''
                 CREATE TABLE IF NOT EXISTS knowledge_base (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -189,6 +189,6 @@ class MemoryStore:
             
             conn.commit()
             conn.close()
-            logger.info("JARVIS: Learned new pattern from incident.")
+            logger.info("ARTEMIS: Learned new pattern from incident.")
         except Exception as e:
             logger.error(f"Failed to learn from incident: {e}")

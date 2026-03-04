@@ -1,11 +1,11 @@
 # Project Overview: CyberLLM
 
 ## 1. Vision
-**CyberLLM** transforms cybersecurity from a manual, reactive process into an **autonomous, agentic workflow**. By leveraging Large Language Models (LLMs) and a custom JARVIS Controller, this project allows security teams to delegate complex tasks to AI agents.
+**CyberLLM** transforms cybersecurity from a manual, reactive process into an **autonomous, agentic workflow**. By leveraging Large Language Models (LLMs) and a custom ARTEMIS Controller, this project allows security teams to delegate complex tasks to AI agents.
 
-## 2. Architecture: The JARVIS System
+## 2. Architecture: The ARTEMIS System
 
-The project is built around the **JARVIS Controller**, which acts as the central nervous system:
+The project is built around the **ARTEMIS Controller**, which acts as the central nervous system:
 
 1.  **Intent Classification**: "Brain" that processes natural language.
 2.  **Scenario Engine**: "Reflexes" that execute pre-defined, safe workflows (Threat Hunt, Network Scan).
@@ -13,7 +13,7 @@ The project is built around the **JARVIS Controller**, which acts as the central
 4.  **Knowledge Base**: "Memory" that learns from past incidents.
 
 ## 3. Agents & Roles
--   **JARVIS**: The decision maker.
+-   **ARTEMIS**: The decision maker.
 -   **Task Coordinator**: Orchestrates sub-tasks.
 -   **Text Analyst**: Forensic analysis of logs and files.
 -   **Command Executor**: Safely runs shell commands (PowerShell/Bash awareness).

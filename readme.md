@@ -17,7 +17,7 @@
 4. [How to Run](#how-to-run)
 5. [LLM Configuration](#llm-configuration)
 6. [Menu Options](#menu-options)
-7. [JARVIS AI Assistant](#jarvis-ai-assistant)
+7. [ARTEMIS AI Assistant](#artemis-ai-assistant)
 8. [OSINT Tools](#osint-tools)
 9. [Architecture](#architecture)
 10. [Configuration](#configuration)
@@ -28,12 +28,12 @@
 
 ## Overview
 
-**CyberLLM** is an advanced autonomous cybersecurity framework powered by AI. It uses a built-in JARVIS AI assistant that understands natural language to perform security operations, threat hunting, and OSINT tasks.
+**CyberLLM** is an advanced autonomous cybersecurity framework powered by AI. It uses a built-in ARTEMIS AI assistant that understands natural language to perform security operations, threat hunting, and OSINT tasks.
 
 ### Key Highlights
 
 - **Dual LLM Support** - Use local Ollama models or Groq API
-- **JARVIS AI** - Natural language interface for security operations
+- **ARTEMIS AI** - Natural language interface for security operations
 - **Cross-Platform** - Works on Windows, Linux, and Mac
 - **Persistent Memory** - SQLite-based learning from past incidents
 - **Auto-Detection** - Automatically detects Ollama when available
@@ -47,7 +47,7 @@
 | Feature | Description |
 |---------|-------------|
 | **Dual LLM Mode** | Use local Ollama (gpt-oss-20b) or Groq API |
-| **JARVIS AI** | Natural language assistant for security operations |
+| **ARTEMIS AI** | Natural language assistant for security operations |
 | **Intent Classification** | Automatically detects user intent |
 | **Memory Engine** | SQLite-based persistent learning |
 | **Cross-Platform** | Windows, Linux, Mac support |
@@ -61,7 +61,7 @@
 - **PROCESSES** - Running processes
 - **SERVICES** - System services
 - **FULL** - Complete security scan
-- **JARVIS** - Interactive AI assistant
+- **ARTEMIS** - Interactive AI assistant
 
 ---
 
@@ -96,17 +96,17 @@ pip install -r requirements.txt
 python main.py
 ```
 
-### Option 2: JARVIS AI Assistant
+### Option 2: ARTEMIS AI Assistant
 
 ```bash
-python jarvis.py
+python artemis.py
 ```
 
 ### Quick Commands
 
 ```
 # From main.py menu:
-[J] JARVIS    - Interactive AI Assistant
+  [A] ARTEMIS    - Interactive AI Assistant
 [L] LOCAL     - Switch to local Ollama
 [A] API       - Switch to Groq API
 [1-6]         - Run scans
@@ -171,7 +171,7 @@ SELECT MODE:
   [5] SERVICES  - System services
   [6] FULL      - Complete scan
   ─────────────────────────────
-  [J] JARVIS    - Interactive AI Assistant
+[A] ARTEMIS    - Interactive AI Assistant
   ─────────────────────────────
   [L] LOCAL     - Switch to local Ollama
   [A] API       - Switch to Groq API
@@ -181,19 +181,19 @@ SELECT MODE:
 
 ---
 
-## JARVIS AI Assistant
+## ARTEMIS AI Assistant
 
 ### What You Can Ask
 
 ```
-JARVIS > who is the president of usa
-JARVIS > explain SQL injection
-JARVIS > check open ports
-JARVIS > CVE-2024-1234
-JARVIS > 8.8.8.8
-JARVIS > https://example.com
-JARVIS > run full scan
-JARVIS > list administrators
+ARTEMIS > who is the president of usa
+ARTEMIS > explain SQL injection
+ARTEMIS > check open ports
+ARTEMIS > CVE-2024-1234
+ARTEMIS > 8.8.8.8
+ARTEMIS > https://example.com
+ARTEMIS > run full scan
+ARTEMIS > list administrators
 ```
 
 ### Commands
@@ -252,13 +252,13 @@ https://...  - Web scraping
 ```
 cyberllm/
 ├── core/
-│   ├── jarvis.py      # Main JARVIS controller
+│   ├── artemis.py     # Main ARTEMIS controller
 │   ├── scanner.py     # Cross-platform scanner
 │   ├── intent.py      # Intent classifier
 │   ├── memory.py      # SQLite memory
 │   └── osint.py       # CVE, IP, web tools
 ├── main.py            # Menu interface
-├── jarvis.py          # AI assistant
+├── artemis.py          # AI assistant
 └── .env              # Configuration
 ```
 

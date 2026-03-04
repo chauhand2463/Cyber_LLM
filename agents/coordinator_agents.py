@@ -2,7 +2,7 @@ from autogen_compat import ConversableAgent, register_function
 from utils.shared_config import llm_config
 from tools.memory_tools import query_memory
 
-JARVIS_SYSTEM_PROMPT = """You are JARVIS, an elite Cyber Security Analyst. Analyze the data and provide tactical intelligence.
+ARTEMIS_SYSTEM_PROMPT = """You are ARTEMIS, an elite Cyber Security Analyst. Analyze the data and provide tactical intelligence.
 
 Format:
 **CRITICAL**: [Key threats in 1 line]
@@ -46,8 +46,8 @@ Append "TERMINATE" to your response ONLY if "is_complete": true.
 """,
 )
 
-jarvis_analyst_agent = ConversableAgent(
-    name="jarvis_analyst_agent",
+artemis_analyst_agent = ConversableAgent(
+    name="artemis_analyst_agent",
     llm_config=llm_config,
     human_input_mode="NEVER",
     code_execution_config=False,
@@ -55,8 +55,8 @@ jarvis_analyst_agent = ConversableAgent(
     is_termination_msg=lambda msg: (
         "terminate" in (msg.get("content") or "").lower() if msg else False
     ),
-    description="""Elite Cyber Security Analyst (Jarvis) that provides actionable intelligence.""",
-    system_message=JARVIS_SYSTEM_PROMPT,
+    description="""Elite Cyber Security Analyst (Artemis) that provides actionable intelligence.""",
+    system_message=ARTEMIS_SYSTEM_PROMPT,
 )
 
 # Register the memory tool

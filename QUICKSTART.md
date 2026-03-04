@@ -20,44 +20,43 @@ cyberllm
 
 | Command | Description |
 |---------|-------------|
-| `cyberllm` then select `3` | JARVIS AI Assistant |
+| `cyberllm` then select `A` | ARTEMIS AI Assistant |
 | `python main.py 1` | Quick system info |
-| `python main.py 2` | Full threat hunt |
-| `python main.py 3` | JARVIS AI Assistant |
-| `python main.py 4` | Network scan |
-| `python main.py 5` | User audit |
-| `python main.py 6` | Threat scan |
-| `python main.py 7` | Complete scan |
+| `python main.py 2` | Network scan |
+| `python main.py 3` | User audit |
+| `python main.py 4` | Process list |
+| `python main.py 5` | Services |
+| `python main.py 6` | Full scan |
 
-## JARVIS Examples
+## ARTEMIS Examples
 
 ### Web Scraping
 ```
-JARVIS > https://example.com
+ARTEMIS > https://example.com
 ```
 
 ### CVE Lookup
 ```
-JARVIS > CVE-2024-1234
+ARTEMIS > CVE-2024-1234
 ```
 
 ### IP Lookup
 ```
-JARVIS > 8.8.8.8
+ARTEMIS > 8.8.8.8
 ```
 
 ### Security Commands
 ```
-JARVIS > check open ports
-JARVIS > list administrators
-JARVIS > system info
-JARVIS > scan for threats
+ARTEMIS > check open ports
+ARTEMIS > list administrators
+ARTEMIS > system info
+ARTEMIS > scan for threats
 ```
 
 ### General Questions
 ```
-JARVIS > what is Python?
-JARVIS > explain SQL injection
+ARTEMIS > what is Python?
+ARTEMIS > explain SQL injection
 ```
 
 ## Environment Setup
